@@ -1,0 +1,27 @@
+CREATE TABLE Birimler (
+    birimID INT PRIMARY KEY,
+    birimAd VARCHAR(25)
+);
+CREATE TABLE Calisanlar (
+    calisanID INT PRIMARY KEY,
+    ad VARCHAR(25),
+    soyad VARCHAR(25),
+    maas INT,
+    katilmaTarihi DATETIME,
+    calisanBirimID INT,
+    FOREIGN KEY (calisanBirimID) REFERENCES Birimler(birimID)
+);
+
+CREATE TABLE Ikramiye (
+    ikramiyeCalisanID INT,
+    ikramiyeUcret INT,
+    ikramiyeTarih DATETIME,
+    FOREIGN KEY (ikramiyeCalisanID) REFERENCES Calisanlar(calisanID)
+);
+
+CREATE TABLE Unvan (
+    unvanCalisanID INT,
+    unvanCalisan VARCHAR(25),
+    unvanTarih DATETIME,
+    FOREIGN KEY (unvanCalisanID) REFERENCES Calisanlar(calisanID)
+);
