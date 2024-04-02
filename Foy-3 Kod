@@ -1,3 +1,5 @@
+TABLOLAR
+
 CREATE TABLE Birimler (
     birimID INT PRIMARY KEY,
     birimAd VARCHAR(25)
@@ -25,3 +27,79 @@ CREATE TABLE Unvan (
     unvanTarih DATETIME,
     FOREIGN KEY (unvanCalisanID) REFERENCES Calisanlar(calisanID)
 );
+
+
+
+
+VERİ GİRİŞ KODLARI
+
+
+INSERT INTO Birimler (birimID, birimAd) VALUES
+(1, 'Yazılım'),
+(2, 'Donanım'),
+(3, 'Güvenlik');
+
+INSERT INTO Calisanlar (calisanID, ad, soyad, maas, katilmaTarihi, calisanBirimID) VALUES
+(1, 'İsmail', 'İşeri', 100000, '2014-02-20', 1),
+(2, 'Hami', 'Satılmış', 80000, '2014-06-11', 1),
+(3, 'Durmuş', 'Şahin', 300000, '2014-02-20', 2),
+(4, 'Kağan', 'Yazar', 500000, '2014-02-20', 3),
+(5, 'Meryem', 'Soysaldı', 500000, '2014-06-11', 3),
+(6, 'Duygu', 'Akşehir', 200000, '2014-01-20', 2),
+(7, 'Kübra', 'Seyhan', 75000, '2014-01-20', 1),
+(8, 'Gülcan', 'Yıldız', 90000, '2014-04-11', 3);
+
+INSERT INTO Ikramiye (ikramiyeCalisanID, ikramiyeUcret, ikramiyeTarih) VALUES
+(1, 5000, '2016-02-20'),
+(2, 3000, '2016-06-11'),
+(3, 4000, '2016-02-20'),
+(1, 4500, '2016-02-20'),
+(2, 3500, '2016-06-11');
+
+INSERT INTO Unvan (unvanCalisanID, unvanCalisan, unvanTarih) VALUES
+(1, 'Yönetici', '2016-02-20'),
+(2, 'Personel', '2016-06-11'),
+(8, 'Personel', '2016-06-11'),
+(5, 'Müdür', '2016-06-11'),
+(4, 'Yönetici Yardımcısı', '2016-06-11'),
+(7, 'Personel', '2016-06-11'),
+(6, 'Takım Lideri', '2016-06-11'),
+(3, 'Takım Lideri', '2016-06-11');
+
+
+
+
+
+
+
+SORGU KODLARI
+
+
+SELECT ad, soyad, maas FROM Calisanlar INNER JOIN Birimler ON calisanBirimID = birimID WHERE birimAd = 'Yazılım' OR birimAd = 'Donanım';
+
+SELECT ad, soyad, maas FROM Calisanlar WHERE maas = (SELECT MAX(maas) FROM Calisanlar);
+
+SELECT b.birimAd, COUNT(c.calisanID) AS calisan_sayisi FROM Birimler b LEFT JOIN Calisanlar c ON b.birimID = c.calisanBirimID GROUP BY b.birimAd;
+
+SELECT unvanCalisan AS unvan, COUNT(unvanCalisanID) AS calisan_sayisi FROM Unvan GROUP BY unvanCalisan;
+
+SELECT ad, soyad, maas FROM Calisanlar WHERE maas BETWEEN 50000 AND 100000;
+
+SELECT c.ad, c.soyad, b.birimAd AS birim, u.unvanCalisan AS unvan, i.ikramiyeUcret AS ikramiye
+FROM Calisanlar c
+JOIN Birimler b ON c.calisanBirimID = b.birimID
+JOIN Unvan u ON c.calisanID = u.unvanCalisanID
+JOIN Ikramiye i ON c.calisanID = i.ikramiyeCalisanID;
+
+SELECT ad, soyad, unvanCalisan AS unvan
+FROM Calisanlar
+JOIN Unvan ON calisanID = unvanCalisanID
+WHERE unvanCalisan IN ('Yönetici', 'Müdür');
+
+SELECT c.ad, c.soyad, c.maas
+FROM Calisanlar c
+INNER JOIN (
+    SELECT calisanBirimID, MAX(maas) AS max_maas
+    FROM Calisanlar
+    GROUP BY calisanBirimID
+) max_maaslar ON c.calisanBirimID = max_maaslar.calisanBirimID AND c.maas = max_maaslar.max_maas;
